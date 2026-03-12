@@ -1,0 +1,79 @@
+envfile = ".env"
+
+[executor]
+type = "uv"
+
+[env]
+RUN_BASE = "src/sam_s3"
+TRIVY_IGNORE = "--skip-dirs ./tmp,./xml"
+SHELL = "bash"
+
+[tasks]
+main = "sam-s3"
+
+# ======== tests
+test = "pytest -v --tb=short src"
+tests = ["test"]
+
+# ======== smoke tests
+smoke1 = "uv run --isolated --no-project --with dist/*.whl sam_s3"
+smoke2 = "uv run --isolated --no-project --with dist/*.tar.gz sam_s3"
+smoke_test = ["smoke1", "smoke2"]
+
+# ======== lint
+check = "ruff check ./src"
+mypy = "mypy src"
+pyproject_lint = "validate-pyproject pyproject.toml"
+actionlint = "actionlint"
+
+lint = ["check", "mypy", "pyproject_lint"]
+lint_full = ["lint", "actionlint"]
+
+audit = "uvx uv-secure ./uv.lock"
+audit-next = "uv audit --preview-features audit"
+# ======== build
+# clean = "rm -rf dist"
+clean = "python -c \"import shutil; shutil.rmtree('dist', ignore_errors=True)\""
+pack = "uv build"
+
+# ======== build
+build = [
+  "audit",
+  "lint",
+  # "format",
+  "tests",
+  # "actionlint",
+  "clean",
+  "pack",
+  "smoke_test",
+]
+
+# ======== utils
+format.shell = """
+ruff format &&
+# biome format --write . &&
+dprint fmt --config ~/dprint.json &&
+textlint --fix "**/*.md"
+"""
+
+update.shell = "uv lock -U && uv sync"
+
+uvsync = "uv sync"
+requirements = "uv pip compile pyproject.toml --no-deps -o requirements.txt"
+sync = ["uvsync", "requirements"]
+
+trivy-config = "trivy config ."
+trivy-fs = "trivy fs ${TRIVY_IGNORE} ."
+trivy-check = ["trivy-config", "trivy-fs"]
+trivy = ["trivy-check"]
+trivy-license = "trivy fs ${TRIVY_IGNORE} --scanners license --severity HIGH,CRITICAL ."
+trivy-sbom = "trivy fs ${TRIVY_IGNORE} --scanners vuln --format cyclonedx --output sbom.cdx.json ."
+trivy-sbom-spdx = "trivy fs ${TRIVY_IGNORE} --scanners vuln --format spdx-json --output sbom.spdx.json ."
+sbom = ["requirements", "trivy-sbom", "trivy-sbom-spdx"]
+
+[tasks.testpypi]
+help = "Build and upload to Test PyPI"
+envfile = ".env"
+cmd = """uv publish \
+  --publish-url https://test.pypi.org/legacy/ \
+  --token $TEST_PYPI_TOKEN"""

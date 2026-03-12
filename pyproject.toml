@@ -1,0 +1,24 @@
+[project]
+name = "sam-s3"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+  { name = "heiwa4126", email = "heiwa4126@gmail.com" },
+]
+requires-python = ">=3.12"
+dependencies = [
+  "boto3>=1.42.66",
+]
+
+[project.scripts]
+sam-s3 = "sam_s3:main"
+
+[build-system]
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+  "poethepoet>=0.42.1",
+]

@@ -14,13 +14,46 @@ Resources:
   TestS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
       PublicAccessBlockConfiguration:
         BlockPublicAcls: True
-        BlockPublicPolicy: True
+        BlockPublicPolicy: False
         IgnorePublicAcls: True
-        RestrictPublicBuckets: True
+        RestrictPublicBuckets: False
+
+  TestS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TestS3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowPublicReadObjectsOnly
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${TestS3Bucket.Arn}/*"
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt TestS3Bucket.Arn
+              - !Sub "${TestS3Bucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
 
 Outputs:
   TestS3BucketName:
     Description: "Name of the S3 bucket created by SAM"
     Value: !Ref TestS3Bucket
+  TestS3BucketHttpsEndpoint:
+    Description: "HTTPS endpoint for public object access via the S3 REST API"
+    Value: !Sub "https://${TestS3Bucket.RegionalDomainName}"

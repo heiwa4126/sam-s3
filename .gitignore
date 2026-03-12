@@ -245,3 +245,9 @@ $RECYCLE.BIN/
 
 # AWS SAM build artifacts
 .aws-sam/
+
+tmp*
+tmp/
+*.tmp
+
+.env

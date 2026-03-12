@@ -1,0 +1,5 @@
+{
+	"evenBetterToml.schema.associations": {
+		"samconfig.toml": "https://raw.githubusercontent.com/aws/aws-sam-cli/master/schema/samcli.json"
+	}
+}

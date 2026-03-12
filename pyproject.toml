@@ -20,6 +20,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+  "aws-sam-cli>=1.148.0",
   "poethepoet>=0.42.1",
   "pyrefly>=0.56.0",
 ]

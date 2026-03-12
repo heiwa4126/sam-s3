@@ -7,7 +7,7 @@ from typing import Any
 
 from .lib import find_samconfig_path, load_stack_and_region
 from .s3_object_ops import delete_public_index_html, upload_public_index_html
-from .stack_outputs import describe_stack_outputs
+from .stack_outputs import describe_stack_outputs, get_stack_output_value
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -85,7 +85,19 @@ def _run_upload(source_path: str, object_key: str, environment: str) -> int:
         object_key=object_key,
         environment=environment,
     )
+
+    config_path = find_samconfig_path()
+    stack_name, region = load_stack_and_region(config_path, environment=environment)
+    https_endpoint = get_stack_output_value(
+        stack_name=stack_name,
+        region=region,
+        output_key="TestS3BucketHttpsEndpoint",
+    )
+    object_path = object_key.lstrip("/")
+    object_url = f"{https_endpoint.rstrip('/')}/{object_path}"
+
     print(json.dumps(_json_safe_response(response), indent=2, ensure_ascii=False))
+    print(object_url)
     return 0
 
 

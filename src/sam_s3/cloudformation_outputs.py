@@ -17,6 +17,27 @@ def describe_stack_outputs(stack_name: str, region: str) -> list[dict[str, Any]]
     return stacks[0].get("Outputs", [])
 
 
+def get_stack_output_value(
+    stack_name: str,
+    region: str,
+    output_key: str,
+) -> str:
+    outputs = describe_stack_outputs(stack_name=stack_name, region=region)
+    matched = [output for output in outputs if output.get("OutputKey") == output_key]
+    if not matched:
+        raise KeyError(
+            f"Output key '{output_key}' was not found in stack '{stack_name}'"
+        )
+
+    output_value = matched[0].get("OutputValue")
+    if not isinstance(output_value, str) or output_value == "":
+        raise ValueError(
+            f"Output key '{output_key}' in stack '{stack_name}' does not have a valid value"
+        )
+
+    return output_value
+
+
 def main() -> None:
     config_path = find_samconfig_path()
     stack_name, region = load_stack_and_region(config_path)

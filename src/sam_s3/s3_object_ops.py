@@ -5,8 +5,8 @@ from typing import Any
 
 import boto3
 
-from .cloudformation_outputs import get_stack_output_value
 from .lib import find_samconfig_path, load_stack_and_region
+from .stack_outputs import get_stack_output_value
 
 
 def resolve_stack_bucket_name(

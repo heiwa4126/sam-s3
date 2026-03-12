@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from .config_types import CommandConfig, CommandParameters, SAMConfig
 
@@ -72,7 +72,10 @@ def load_samconfig(config_path: Path) -> SAMConfig:
 
     try:
         with config_path.open("rb") as f:
-            config: SAMConfig = tomllib.load(f)
+            loaded = tomllib.load(f)
+        if not isinstance(loaded, dict):
+            raise ValueError(f"TOML root must be a table, got {type(loaded).__name__}")
+        config = cast(SAMConfig, loaded)
         return config
     except Exception as e:
         raise ValueError(f"Failed to parse TOML file {config_path}: {e}")
@@ -104,7 +107,14 @@ def get_environment_config(
             f"Environment '{environment}' not found in configuration. "
             f"Available environments: {list(config.keys())}"
         )
-    return config[environment]
+
+    env_config = config[environment]
+    if not isinstance(env_config, dict):
+        raise ValueError(
+            f"Environment '{environment}' must be a table, got {type(env_config).__name__}"
+        )
+
+    return env_config
 
 
 def get_command_parameters(
@@ -137,6 +147,10 @@ def get_command_parameters(
         )
 
     command_config = env_config[command]
+    if not isinstance(command_config, dict):
+        raise ValueError(
+            f"Command '{command}' config must be a table, got {type(command_config).__name__}"
+        )
     return command_config.get("parameters", {})
 
 

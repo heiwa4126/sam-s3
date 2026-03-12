@@ -21,4 +21,5 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
   "poethepoet>=0.42.1",
+  "pyrefly>=0.56.0",
 ]

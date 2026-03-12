@@ -22,11 +22,11 @@ smoke_test = ["smoke1", "smoke2"]
 
 # ======== lint
 check = "ruff check ./src"
-mypy = "mypy src"
+pyrefly = "pyrefly check ./src"
 pyproject_lint = "validate-pyproject pyproject.toml"
 actionlint = "actionlint"
 
-lint = ["check", "mypy", "pyproject_lint"]
+lint = ["check", "pyrefly", "pyproject_lint"]
 lint_full = ["lint", "actionlint"]
 
 audit = "uvx uv-secure ./uv.lock"

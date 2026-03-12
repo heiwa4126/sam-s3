@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .cloudformation_outputs import describe_stack_outputs
 from .lib import find_samconfig_path, load_stack_and_region
 from .s3_object_ops import delete_public_index_html, upload_public_index_html
+from .stack_outputs import describe_stack_outputs
 
 
 def _build_parser() -> argparse.ArgumentParser:

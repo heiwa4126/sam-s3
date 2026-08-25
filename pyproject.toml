@@ -15,4 +15,4 @@ requires = ["uv_build>=0.10.9,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = ["aws-sam-cli>=1.148.0", "poethepoet>=0.42.1", "pyrefly>=0.56.0"]
+dev = ["aws-sam-cli>=1.165.0", "poethepoet>=0.42.1", "pyrefly>=0.56.0"]
